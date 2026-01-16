@@ -91,12 +91,21 @@
     }
 
     // Flying heads - DVD screensaver style bouncing with HP
-    const HEAD_SIZE = 80;
-    const HEAD_RADIUS = HEAD_SIZE / 2;
-    const CONTAINER_HEIGHT = 93; // head + hp bar
-    const SPEED = 80;
     const MAX_HP = 100;
     const DAMAGE = 15;
+
+    // Responsive sizing
+    function getHeadSize() {
+        return window.innerWidth <= 480 ? 50 : 80;
+    }
+
+    function getContainerHeight() {
+        return window.innerWidth <= 480 ? 61 : 93;
+    }
+
+    function getSpeed() {
+        return window.innerWidth <= 480 ? 60 : 80;
+    }
 
     const heads = [
         {
@@ -131,10 +140,11 @@
 
     // Normalize velocity to maintain consistent speed
     function normalizeSpeed(head) {
+        const speed = getSpeed();
         const currentSpeed = Math.sqrt(head.vx * head.vx + head.vy * head.vy);
         if (currentSpeed > 0) {
-            head.vx = (head.vx / currentSpeed) * SPEED;
-            head.vy = (head.vy / currentSpeed) * SPEED;
+            head.vx = (head.vx / currentSpeed) * speed;
+            head.vy = (head.vy / currentSpeed) * speed;
         }
     }
 
@@ -175,11 +185,14 @@
     function handleCollision(head1, head2) {
         if (!head1.alive || !head2.alive) return;
 
+        const headSize = getHeadSize();
+        const headRadius = headSize / 2;
+
         // Get centers of each head
-        const cx1 = head1.x + HEAD_RADIUS;
-        const cy1 = head1.y + HEAD_RADIUS;
-        const cx2 = head2.x + HEAD_RADIUS;
-        const cy2 = head2.y + HEAD_RADIUS;
+        const cx1 = head1.x + headRadius;
+        const cy1 = head1.y + headRadius;
+        const cx2 = head2.x + headRadius;
+        const cy2 = head2.y + headRadius;
 
         // Calculate distance between centers
         const dx = cx2 - cx1;
@@ -187,13 +200,13 @@
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         // Check if colliding (distance < sum of radii)
-        if (distance < HEAD_SIZE && distance > 0) {
+        if (distance < headSize && distance > 0) {
             // Normalize collision vector
             const nx = dx / distance;
             const ny = dy / distance;
 
             // Separate the heads so they don't overlap
-            const overlap = HEAD_SIZE - distance;
+            const overlap = headSize - distance;
             head1.x -= nx * overlap / 2;
             head1.y -= ny * overlap / 2;
             head2.x += nx * overlap / 2;
@@ -239,8 +252,10 @@
         const delta = (timestamp - lastTimestamp) / 1000;
         lastTimestamp = timestamp;
 
-        const maxX = window.innerWidth - HEAD_SIZE;
-        const maxY = window.innerHeight - CONTAINER_HEIGHT;
+        const headSize = getHeadSize();
+        const containerHeight = getContainerHeight();
+        const maxX = window.innerWidth - headSize;
+        const maxY = window.innerHeight - containerHeight;
 
         // Update positions for alive heads
         for (const head of heads) {
@@ -286,17 +301,21 @@
     }
 
     function initFlyingHeads() {
+        const headSize = getHeadSize();
+        const containerHeight = getContainerHeight();
+        const speed = getSpeed();
+
         for (const head of heads) {
             if (!head.container) continue;
 
             // Random starting position
-            head.x = Math.random() * (window.innerWidth - HEAD_SIZE);
-            head.y = Math.random() * (window.innerHeight - CONTAINER_HEIGHT);
+            head.x = Math.random() * (window.innerWidth - headSize);
+            head.y = Math.random() * (window.innerHeight - containerHeight);
 
             // Random starting direction (random angle)
             const angle = Math.random() * Math.PI * 2;
-            head.vx = Math.cos(angle) * SPEED;
-            head.vy = Math.sin(angle) * SPEED;
+            head.vx = Math.cos(angle) * speed;
+            head.vy = Math.sin(angle) * speed;
 
             // Random starting rotation
             head.rotation = Math.random() * 360;
