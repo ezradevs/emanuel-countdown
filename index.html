@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emanuel School - The Countdown</title>
+    <meta name="description" content="The end of summer approaches. School returns February 2nd, 2026.">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Emanuel School - The Countdown">
+    <meta property="og:description" content="The end of summer approaches...">
+    <meta property="og:type" content="website">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <img src="emms.jpeg" alt="" class="flying-head" id="flying-head-1">
+    <img src="lowe.webp" alt="" class="flying-head" id="flying-head-2">
+    <img src="majsay.jpg" alt="" class="flying-head" id="flying-head-3">
+    <div class="vignette"></div>
+
+    <main class="container">
+        <header class="header">
+            <h1 class="school-name">Emanuel School</h1>
+            <p class="tagline">The end of summer approaches...</p>
+        </header>
+
+        <section class="countdown-section">
+            <div class="countdown" id="countdown">
+                <div class="time-block">
+                    <span class="time-value" id="days">00</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="separator">:</div>
+                <div class="time-block">
+                    <span class="time-value" id="hours">00</span>
+                    <span class="time-label">Hours</span>
+                </div>
+                <div class="separator">:</div>
+                <div class="time-block">
+                    <span class="time-value" id="minutes">00</span>
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div class="separator">:</div>
+                <div class="time-block">
+                    <span class="time-value" id="seconds">00</span>
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+
+            <p class="until-text">until school begins</p>
+        </section>
+
+        <footer class="footer">
+            <p class="date-info">February 2nd, 2026 - 8:20 AM</p>
+        </footer>
+    </main>
+
+    <div class="completed-message" id="completed-message">
+        <h2>It has begun.</h2>
+        <p>School is now in session.</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
