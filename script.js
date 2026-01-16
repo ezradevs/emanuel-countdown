@@ -164,6 +164,7 @@
                     <h2>${winner.name} Wins!</h2>
                     <img src="${winner.el.src}" alt="${winner.name}">
                     <p>Last one standing</p>
+                    <button class="restart-btn" onclick="location.reload()">Battle Again</button>
                 `;
                 winnerMessage.classList.add('show');
             }

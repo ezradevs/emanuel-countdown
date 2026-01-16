@@ -357,6 +357,11 @@ body::before {
     z-index: 300;
     text-align: center;
     display: none;
+    background: rgba(10, 10, 10, 0.95);
+    padding: 3rem;
+    border-radius: 20px;
+    border: 2px solid var(--color-blood);
+    box-shadow: 0 0 60px rgba(139, 0, 0, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
 .winner-message.show {
@@ -385,6 +390,28 @@ body::before {
     color: var(--color-text-dim);
     letter-spacing: 0.2em;
     text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.restart-btn {
+    background: var(--color-blood);
+    color: var(--color-text);
+    border: none;
+    padding: 1rem 2rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+}
+
+.restart-btn:hover {
+    background: var(--color-blood-bright);
+    box-shadow: 0 0 30px var(--color-glow);
+    transform: scale(1.05);
 }
 
 @keyframes shake {
