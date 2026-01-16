@@ -103,6 +103,15 @@
 
     let lastTimestamp = 0;
 
+    // Normalize velocity to maintain consistent speed
+    function normalizeSpeed(head) {
+        const currentSpeed = Math.sqrt(head.vx * head.vx + head.vy * head.vy);
+        if (currentSpeed > 0) {
+            head.vx = (head.vx / currentSpeed) * SPEED;
+            head.vy = (head.vy / currentSpeed) * SPEED;
+        }
+    }
+
     // Check and handle collision between two heads
     function handleCollision(head1, head2) {
         // Get centers of each head
@@ -143,6 +152,10 @@
                 head1.vy -= dvn * ny;
                 head2.vx += dvn * nx;
                 head2.vy += dvn * ny;
+
+                // Normalize speeds to keep them consistent
+                normalizeSpeed(head1);
+                normalizeSpeed(head2);
             }
         }
     }
@@ -207,9 +220,10 @@
             head.x = Math.random() * (window.innerWidth - HEAD_SIZE);
             head.y = Math.random() * (window.innerHeight - HEAD_SIZE);
 
-            // Random starting direction
-            head.vx = (Math.random() > 0.5 ? 1 : -1) * SPEED;
-            head.vy = (Math.random() > 0.5 ? 1 : -1) * SPEED * (0.6 + Math.random() * 0.4);
+            // Random starting direction (random angle)
+            const angle = Math.random() * Math.PI * 2;
+            head.vx = Math.cos(angle) * SPEED;
+            head.vy = Math.sin(angle) * SPEED;
 
             // Random starting rotation
             head.rotation = Math.random() * 360;
