@@ -90,17 +90,43 @@
         }
     }
 
-    // Flying heads - DVD screensaver style bouncing
+    // Flying heads - DVD screensaver style bouncing with HP
     const HEAD_SIZE = 80;
     const HEAD_RADIUS = HEAD_SIZE / 2;
+    const CONTAINER_HEIGHT = 93; // head + hp bar
     const SPEED = 80;
+    const MAX_HP = 100;
+    const DAMAGE = 15;
 
     const heads = [
-        { el: document.getElementById('flying-head-1'), x: 0, y: 0, vx: 0, vy: 0, rotation: 0 },
-        { el: document.getElementById('flying-head-2'), x: 0, y: 0, vx: 0, vy: 0, rotation: 0 },
-        { el: document.getElementById('flying-head-3'), x: 0, y: 0, vx: 0, vy: 0, rotation: 0 }
+        {
+            container: document.getElementById('head-container-1'),
+            el: document.getElementById('flying-head-1'),
+            hpBar: document.getElementById('hp-1'),
+            name: 'Emms',
+            x: 0, y: 0, vx: 0, vy: 0, rotation: 0,
+            hp: MAX_HP, alive: true
+        },
+        {
+            container: document.getElementById('head-container-2'),
+            el: document.getElementById('flying-head-2'),
+            hpBar: document.getElementById('hp-2'),
+            name: 'Lowe',
+            x: 0, y: 0, vx: 0, vy: 0, rotation: 0,
+            hp: MAX_HP, alive: true
+        },
+        {
+            container: document.getElementById('head-container-3'),
+            el: document.getElementById('flying-head-3'),
+            hpBar: document.getElementById('hp-3'),
+            name: 'Majsay',
+            x: 0, y: 0, vx: 0, vy: 0, rotation: 0,
+            hp: MAX_HP, alive: true
+        }
     ];
 
+    const winnerMessage = document.getElementById('winner-message');
+    let gameOver = false;
     let lastTimestamp = 0;
 
     // Normalize velocity to maintain consistent speed
@@ -112,8 +138,42 @@
         }
     }
 
+    // Update HP bar display
+    function updateHpBar(head) {
+        if (head.hpBar) {
+            head.hpBar.style.width = Math.max(0, head.hp) + '%';
+        }
+    }
+
+    // Eliminate a head
+    function eliminateHead(head) {
+        head.alive = false;
+        if (head.container) {
+            head.container.classList.add('eliminated');
+        }
+    }
+
+    // Check for winner
+    function checkWinner() {
+        const alive = heads.filter(h => h.alive);
+        if (alive.length === 1) {
+            gameOver = true;
+            const winner = alive[0];
+            if (winnerMessage) {
+                winnerMessage.innerHTML = `
+                    <h2>${winner.name} Wins!</h2>
+                    <img src="${winner.el.src}" alt="${winner.name}">
+                    <p>Last one standing</p>
+                `;
+                winnerMessage.classList.add('show');
+            }
+        }
+    }
+
     // Check and handle collision between two heads
     function handleCollision(head1, head2) {
+        if (!head1.alive || !head2.alive) return;
+
         // Get centers of each head
         const cx1 = head1.x + HEAD_RADIUS;
         const cy1 = head1.y + HEAD_RADIUS;
@@ -147,6 +207,17 @@
 
             // Only resolve if heads are moving towards each other
             if (dvn > 0) {
+                // Deal damage to both heads
+                head1.hp -= DAMAGE;
+                head2.hp -= DAMAGE;
+                updateHpBar(head1);
+                updateHpBar(head2);
+
+                // Check for eliminations
+                if (head1.hp <= 0) eliminateHead(head1);
+                if (head2.hp <= 0) eliminateHead(head2);
+                checkWinner();
+
                 // Swap velocity components along collision axis
                 head1.vx -= dvn * nx;
                 head1.vy -= dvn * ny;
@@ -161,34 +232,34 @@
     }
 
     function updateHeads(timestamp) {
+        if (gameOver) return;
+
         if (!lastTimestamp) lastTimestamp = timestamp;
         const delta = (timestamp - lastTimestamp) / 1000;
         lastTimestamp = timestamp;
 
         const maxX = window.innerWidth - HEAD_SIZE;
-        const maxY = window.innerHeight - HEAD_SIZE;
+        const maxY = window.innerHeight - CONTAINER_HEIGHT;
 
-        // Update positions
+        // Update positions for alive heads
         for (const head of heads) {
-            if (!head.el) continue;
+            if (!head.alive || !head.container) continue;
 
             head.x += head.vx * delta;
             head.y += head.vy * delta;
             head.rotation += 90 * delta;
         }
 
-        // Check collisions between all pairs of heads
+        // Check collisions between all pairs of alive heads
         for (let i = 0; i < heads.length; i++) {
             for (let j = i + 1; j < heads.length; j++) {
-                if (heads[i].el && heads[j].el) {
-                    handleCollision(heads[i], heads[j]);
-                }
+                handleCollision(heads[i], heads[j]);
             }
         }
 
         // Bounce off edges and apply transforms
         for (const head of heads) {
-            if (!head.el) continue;
+            if (!head.alive || !head.container) continue;
 
             if (head.x <= 0) {
                 head.x = 0;
@@ -206,7 +277,8 @@
                 head.vy = -Math.abs(head.vy);
             }
 
-            head.el.style.transform = `translate(${Math.round(head.x)}px, ${Math.round(head.y)}px) rotate(${Math.round(head.rotation)}deg)`;
+            head.container.style.transform = `translate(${Math.round(head.x)}px, ${Math.round(head.y)}px)`;
+            head.el.style.transform = `rotate(${Math.round(head.rotation)}deg)`;
         }
 
         requestAnimationFrame(updateHeads);
@@ -214,11 +286,11 @@
 
     function initFlyingHeads() {
         for (const head of heads) {
-            if (!head.el) continue;
+            if (!head.container) continue;
 
             // Random starting position
             head.x = Math.random() * (window.innerWidth - HEAD_SIZE);
-            head.y = Math.random() * (window.innerHeight - HEAD_SIZE);
+            head.y = Math.random() * (window.innerHeight - CONTAINER_HEIGHT);
 
             // Random starting direction (random angle)
             const angle = Math.random() * Math.PI * 2;
@@ -227,6 +299,9 @@
 
             // Random starting rotation
             head.rotation = Math.random() * 360;
+
+            // Initialize HP bar
+            updateHpBar(head);
         }
 
         requestAnimationFrame(updateHeads);

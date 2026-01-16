@@ -306,20 +306,85 @@ body::before {
     animation: shake 8s ease-in-out infinite;
 }
 
-/* Flying Principal Head */
-.flying-head {
+/* Flying Principal Heads */
+.head-container {
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 75;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.head-container.eliminated {
+    display: none;
+}
+
+.flying-head {
     width: 80px;
     height: 80px;
     object-fit: cover;
     border-radius: 50%;
-    z-index: 75;
-    pointer-events: none;
     box-shadow: 0 0 20px var(--color-blood);
-    will-change: transform;
-    contain: layout style;
+    display: block;
+}
+
+/* HP Bars */
+.hp-bar {
+    width: 70px;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--color-blood);
+    border-radius: 4px;
+    margin: 0 auto 5px;
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, var(--color-blood), var(--color-glow));
+    border-radius: 3px;
+    transition: width 0.2s ease;
+}
+
+/* Winner Message */
+.winner-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 300;
+    text-align: center;
+    display: none;
+}
+
+.winner-message.show {
+    display: block;
+}
+
+.winner-message h2 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    color: var(--color-glow);
+    text-shadow: 0 0 30px var(--color-glow), 0 0 60px var(--color-blood);
+    margin-bottom: 1rem;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.winner-message img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 0 30px var(--color-glow), 0 0 60px var(--color-blood);
+    margin-bottom: 1rem;
+}
+
+.winner-message p {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    color: var(--color-text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
 }
 
 @keyframes shake {
