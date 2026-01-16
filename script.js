@@ -92,6 +92,7 @@
 
     // Flying heads - DVD screensaver style bouncing
     const HEAD_SIZE = 80;
+    const HEAD_RADIUS = HEAD_SIZE / 2;
     const SPEED = 80;
 
     const heads = [
@@ -102,6 +103,50 @@
 
     let lastTimestamp = 0;
 
+    // Check and handle collision between two heads
+    function handleCollision(head1, head2) {
+        // Get centers of each head
+        const cx1 = head1.x + HEAD_RADIUS;
+        const cy1 = head1.y + HEAD_RADIUS;
+        const cx2 = head2.x + HEAD_RADIUS;
+        const cy2 = head2.y + HEAD_RADIUS;
+
+        // Calculate distance between centers
+        const dx = cx2 - cx1;
+        const dy = cy2 - cy1;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Check if colliding (distance < sum of radii)
+        if (distance < HEAD_SIZE && distance > 0) {
+            // Normalize collision vector
+            const nx = dx / distance;
+            const ny = dy / distance;
+
+            // Separate the heads so they don't overlap
+            const overlap = HEAD_SIZE - distance;
+            head1.x -= nx * overlap / 2;
+            head1.y -= ny * overlap / 2;
+            head2.x += nx * overlap / 2;
+            head2.y += ny * overlap / 2;
+
+            // Calculate relative velocity
+            const dvx = head1.vx - head2.vx;
+            const dvy = head1.vy - head2.vy;
+
+            // Calculate relative velocity along collision normal
+            const dvn = dvx * nx + dvy * ny;
+
+            // Only resolve if heads are moving towards each other
+            if (dvn > 0) {
+                // Swap velocity components along collision axis
+                head1.vx -= dvn * nx;
+                head1.vy -= dvn * ny;
+                head2.vx += dvn * nx;
+                head2.vy += dvn * ny;
+            }
+        }
+    }
+
     function updateHeads(timestamp) {
         if (!lastTimestamp) lastTimestamp = timestamp;
         const delta = (timestamp - lastTimestamp) / 1000;
@@ -110,15 +155,28 @@
         const maxX = window.innerWidth - HEAD_SIZE;
         const maxY = window.innerHeight - HEAD_SIZE;
 
+        // Update positions
         for (const head of heads) {
             if (!head.el) continue;
 
-            // Update position
             head.x += head.vx * delta;
             head.y += head.vy * delta;
             head.rotation += 90 * delta;
+        }
 
-            // Bounce off edges
+        // Check collisions between all pairs of heads
+        for (let i = 0; i < heads.length; i++) {
+            for (let j = i + 1; j < heads.length; j++) {
+                if (heads[i].el && heads[j].el) {
+                    handleCollision(heads[i], heads[j]);
+                }
+            }
+        }
+
+        // Bounce off edges and apply transforms
+        for (const head of heads) {
+            if (!head.el) continue;
+
             if (head.x <= 0) {
                 head.x = 0;
                 head.vx = Math.abs(head.vx);
@@ -135,7 +193,6 @@
                 head.vy = -Math.abs(head.vy);
             }
 
-            // Apply transform
             head.el.style.transform = `translate(${Math.round(head.x)}px, ${Math.round(head.y)}px) rotate(${Math.round(head.rotation)}deg)`;
         }
 
